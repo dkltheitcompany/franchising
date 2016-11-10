@@ -19,4 +19,10 @@ class model_project
         DataBase::querry('stage_info_franchisor', $_SESSION['userid']);
         return DataBase::fetch();
     }
+    
+    public static function info_coordinator($userid)
+    {
+        DataBase::querry('info_coordinator_franchisor', $userid);
+        return DataBase::fetch();
+    }
 }

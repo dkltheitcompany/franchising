@@ -26,4 +26,26 @@ class controller_project
         else
             header("Location: /authorization");
     }
+    
+    public static function project_info($userid)
+    {
+        session_start();
+        if (isset($_SESSION['userid']))
+        {
+            switch ($_SESSION['usertype'])
+            {
+            case 'franchisor':
+                view_project::make();
+                break;
+            case 'coordinator':
+                view_project::make_info_coordinator(model_project::info_coordinator($userid));
+                break;
+            case 'project_manager':
+                view_project::make();
+                break;
+            }
+        }
+        else
+            header("Location: /authorization");
+    }
 }

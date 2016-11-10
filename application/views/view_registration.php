@@ -22,36 +22,36 @@ class view_registration
         else if (!$valid_inputs['repeatpassword'])
             $report_password = 'Неправильно повторён пароль';
         
-        $view_body = include ROOT.'/application/views/registration_form.php';
+        $view_body = file_get_contents(ROOT.'/application/views/forms/registration_form.php');
         
-        include ROOT.'/application/views/view_template.php';
+        include ROOT.'/application/views/pages/view_template.php';
     }
     
     public static function make_bad_apply()
     {
         $view_body = 'Вы не заполнили форму регистрации.';
         
-        include ROOT.'/application/views/view_template.php';
+        include ROOT.'/application/views/pages/view_template.php';
     }
 
     public static function make_confirm_form()
     {
-        $view_body = file_get_contents(ROOT.'/application/views/confirm_form.php');
+        $view_body = file_get_contents(ROOT.'/application/views/forms/confirm_form.php');
         
-        include ROOT.'/application/views/view_template.php';
+        include ROOT.'/application/views/pages/view_template.php';
     }
     
     public static function make_confirm()
     {
         $view_body = 'E-mail подтверждён.<br><a href="/authorization">Войти в аккаунт</a>';
         
-        include ROOT.'/application/views/view_template.php';
+        include ROOT.'/application/views/pages/view_template.php';
     }
     
     public static function make_invalid_confirm()
     {
         $view_body = 'Неверный код.<br><a href="/registration/confirm">Повторить попытку</a>';
         
-        include ROOT.'/application/views/view_template.php';
+        include ROOT.'/application/views/pages/view_template.php';
     }
 }

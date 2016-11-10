@@ -10,3 +10,8 @@ function change_key($key, $new_key, &$arr, $rewrite=true)
     }
     return false;
 }
+
+function run_php($filename, $data)
+{
+     file_get_contents($filename);
+}

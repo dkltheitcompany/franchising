@@ -6,6 +6,6 @@ class view_main
     {
         $view_body = 'Дратути, дратути.<br><a href="/registration">Регистрация</a>';
 
-        include ROOT.'/application/views/view_template.php';
+        include ROOT.'/application/views/pages/view_template.php';
     }
 }

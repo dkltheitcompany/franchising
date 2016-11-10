@@ -67,8 +67,12 @@ return [
         'args' => [':userid', ':cityid']
     ],
     'coord_list_find_franchisor' => [
-        'querry' => 'SELECT user.*, franchisor.* FROM user, franchisor WHERE franchisor.stage IN (\'application\', \'contract\') AND user.userid=franchisor.userid',
+        'querry' => 'SELECT user.userid, user.userfname, user.usersname, franchisor.cityid FROM user, franchisor WHERE franchisor.stage IN (\'application\', \'contract\') AND user.userid=franchisor.userid',
         'args' => []
+    ],
+    'info_coordinator_franchisor' => [
+        'querry' => 'SELECT user.userfname, user.usersname, user.usertname, user.userpnum, user.usermail, franchisor.* FROM user, franchisor WHERE franchisor.stage IN (\'application\', \'contract\') AND user.userid=franchisor.userid',
+        'args' => [':userid']
     ],
     'stage_info_franchisor' => [
         'querry' => 'SELECT stage, applied, lasupdate FROM franchisor WHERE userid=:userid',
