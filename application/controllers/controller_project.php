@@ -19,11 +19,27 @@ class controller_project
                 view_project::make_list_franch(model_project::list_franch());
                 break;
             case 'project_manager':
-                view_project::make();
+                view_project::make_list_franch(model_project::list_franch());
                 break;
             }
         }
         else
             header("Location: /authorization");
     }
+    
+    public static function view($userid)
+    {
+        
+        session_start();
+        if(isset($_SESSION['userid']))
+        {
+            switch ($_SESSION['usertype'])
+            {
+                case 'project_manager':
+                    view_project::make_project_info(model_project::project_info($userid));
+            }
+        }
+        else header("Location: /authorization");
+    }
+    
 }
