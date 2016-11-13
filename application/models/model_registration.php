@@ -98,7 +98,7 @@ class model_registration
         DataBase::querry('add_user',
                 self::$user['userfname'], self::$user['usersname'], self::$user['usertname'], 
                 self::$user['usermail'], self::$user['userpnum'], self::$user['userpassword'],
-                'project_manager ');//project_manager franchisor
+                'franchisor');//project_manager franchisor
         DataBase::querry('add_new_franchisor', DataBase::last_insert_id(), 42);
         DataBase::querry('delete_user_tmp', self::$user['usercode']);
     }
