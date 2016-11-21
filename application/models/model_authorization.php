@@ -10,7 +10,7 @@ class model_authorization {
         if (empty($_POST['submit_apply_reset']))
             return false;
         
-        DataBase::querry('reset_find_user', $_POST['usermail']);
+        DataBase::querry_tmp('reset_find_user', $_POST['usermail']);
         if (empty(self::$user = DataBase::fetch()))
             return self::$valid_form = false;
         
@@ -19,7 +19,7 @@ class model_authorization {
 
     public static function is_valid_reset($hash)
     {
-        DataBase::querry('find_hash_reset', $hash);
+        DataBase::querry_tmp('find_hash_reset', $hash);
         if(empty(self::$user = DataBase::fetch()))
                 return false;
         
@@ -39,14 +39,14 @@ class model_authorization {
 
     public static function reset()
     {
-        DataBase::querry('new_password_user', $_POST['userid'], password_hash($_POST['userpassword'], PASSWORD_BCRYPT));
-        DataBase::querry('delete_reset', $_POST['userid']);
+        DataBase::querry_tmp('new_password_user', $_POST['userid'], password_hash($_POST['userpassword'], PASSWORD_BCRYPT));
+        DataBase::querry_tmp('delete_reset', $_POST['userid']);
     }
 
     public static function apply_reset()
     {
         $hash = sha1(self::$user['userid'].$_POST['usermail']);
-        DataBase::querry('add_reset', self::$user['userid'], $hash);
+        DataBase::querry_tmp('add_reset', self::$user['userid'], $hash);
         MailMessager::sendmsg('reset', $_POST['usermail'], $hash);
     }
 
@@ -55,7 +55,7 @@ class model_authorization {
         if (empty($_POST['submit_auth']))
             return false;
 
-        DataBase::querry('auth_find_user', $_POST['userpnum']);
+        DataBase::querry_tmp('auth_find_user', $_POST['userpnum']);
         if (empty(self::$user = DataBase::fetch()))
             return self::$valid_form = false;
 

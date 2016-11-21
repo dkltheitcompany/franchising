@@ -15,3 +15,8 @@
         <td>Последнее обновление</td><td><?php echo $project['lastupdate']; ?></td>
     </tr>
 </table>
+Задания:
+<form action="" method="post">
+    <?php TaskPool::get_form_gala(); ?>
+    <input type="submit" name="submit" value="Подтвердить">
+</form>

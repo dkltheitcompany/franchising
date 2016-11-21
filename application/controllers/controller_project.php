@@ -13,7 +13,8 @@ class controller_project
             switch ($_SESSION['usertype'])
             {
             case 'franchisor':
-                view_project::make_stage(model_project::stage_info());
+                model_project::take_form_franch();
+                view_project::make_info_franchisor(model_project::info_franchisor());
                 break;
             case 'coordinator':
                 view_project::make_list_franch(model_project::list_franch());
@@ -35,9 +36,10 @@ class controller_project
             switch ($_SESSION['usertype'])
             {
             case 'franchisor':
-                view_project::make();
+                http_response_code(404);
                 break;
             case 'coordinator':
+                model_project::take_form_coord($userid);
                 view_project::make_info_coordinator(model_project::info_coordinator($userid));
                 break;
             case 'project_manager':

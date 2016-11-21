@@ -17,7 +17,14 @@ class DataBase
         }
     }
     
-    public static function querry($querry, ...$args)
+    public static function querry($querry, $args = [])
+    {
+        self::connect();
+        self::$querry = self::$connection->prepare($querry);
+        self::$querry->execute($args);
+    }
+    
+    public static function querry_tmp($querry, ...$args)
     {
         self::connect();
         $querry = self::$querries[$querry];

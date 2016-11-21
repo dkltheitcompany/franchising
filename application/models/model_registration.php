@@ -15,7 +15,7 @@ class model_registration
     
     private static function unique()
     {
-        DataBase::querry('check_unique', $_POST['usermail'], $_POST['userpnum']);
+        DataBase::querry_tmp('check_unique', $_POST['usermail'], $_POST['userpnum']);
         $unique = true;
         while (!empty($user = DataBase::fetch()))
         {
@@ -68,7 +68,7 @@ class model_registration
     
     public static function is_confirm_valid()
     {
-        DataBase::querry('check_code_user_tmp', $_POST['usercode'], $_SESSION['usermail']);
+        DataBase::querry_tmp('check_code_user_tmp', $_POST['usercode'], $_SESSION['usermail']);
         self::$user = DataBase::fetch();
         return !empty(self::$user);
     }
@@ -79,7 +79,7 @@ class model_registration
         do 
         {
             $usercode = self::generate_key();
-            DataBase::querry('add_user_tmp',
+            DataBase::querry_tmp('add_user_tmp',
                     $usercode, $_POST['userfname'], $_POST['usersname'], $_POST['usertname'],
                     $_POST['usermail'], $_POST['userpnum'], $encpword);
         } while (DataBase::error() == 23000);
@@ -88,18 +88,20 @@ class model_registration
     
     public static function repeat()
     {
-        DataBase::querry('repeat_apply_user_tmp', $_SESSION['usermail']);
+        DataBase::querry_tmp('repeat_apply_user_tmp', $_SESSION['usermail']);
         $usercode = DataBase::fetch()['usercode'];
         MailMessager::sendmsg('reg_apply', $_SESSION['usermail'], $usercode);
     }
 
     public static function confirm()
     {
-        DataBase::querry('add_user',
+        DataBase::querry_tmp('add_user',
                 self::$user['userfname'], self::$user['usersname'], self::$user['usertname'], 
                 self::$user['usermail'], self::$user['userpnum'], self::$user['userpassword'],
                 'franchisor');
-        DataBase::querry('add_new_franchisor', DataBase::last_insert_id(), 42);
-        DataBase::querry('delete_user_tmp', self::$user['usercode']);
+        $userid = DataBase::last_insert_id();
+        DataBase::querry_tmp('add_new_franchisor', $userid, 42);
+        TaskPool::new_task_pool($userid);
+        DataBase::querry_tmp('delete_user_tmp', self::$user['usercode']);
     }
 }

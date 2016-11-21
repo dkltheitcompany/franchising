@@ -75,7 +75,7 @@ return [
         'args' => [':userid']
     ],
     'stage_info_franchisor' => [
-        'querry' => 'SELECT stage, applied, lasupdate FROM franchisor WHERE userid=:userid',
+        'querry' => 'SELECT stage, applied, lastupdate FROM franchisor WHERE userid=:userid',
         'args' => [':userid']
     ],
     
