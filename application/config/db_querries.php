@@ -15,11 +15,11 @@ return [
         'args' => [':usercode', ':userfname', ':usersname', ':usertname', ':usermail', ':userpnum', ':userpassword']
     ],
     'check_code_user_tmp' => [
-        'querry' => 'SELECT usercode, userfname, usersname, usertname, usermail, userpnum, userpassword FROM user_tmp WHERE usercode=:usercode AND usermail=:usermail',
+        'querry' => 'SELECT usercode, userfname, usersname, usertname, usermail, userpnum, userpassword FROM user_tmp WHERE usercode=:usercode AND usermail=:usermail LIMIT 1',
         'args' => [':usercode', ':usermail']
     ],
     'repeat_apply_user_tmp' => [
-        'querry' => 'SELECT usercode FROM user_tmp WHERE usermail=:usermail',
+        'querry' => 'SELECT usercode FROM user_tmp WHERE usermail=:usermail LIMIT 1',
         'args' => [':usermail']
     ],
     'delete_user_tmp' => [
@@ -33,7 +33,7 @@ return [
         'args' => [':userfname', ':usersname', ':usertname', ':usermail', ':userpnum', ':userpassword', ':usertype']
     ],
     'auth_find_user' => [
-        'querry' => 'SELECT userid, userfname, usersname, userpassword, usertype FROM user WHERE userpnum=:userpnum',
+        'querry' => 'SELECT userid, userfname, usersname, userpassword, usertype FROM user WHERE userpnum=:userpnum LIMIT 1',
         'args' => [':userpnum']
     ],
     'delete_user' => [
@@ -41,7 +41,7 @@ return [
         'args' => [':userid']
     ],
     'reset_find_user'=> [
-        'querry' => 'SELECT userid FROM user WHERE usermail=:usermail',
+        'querry' => 'SELECT userid FROM user WHERE usermail=:usermail LIMIT 1',
         'args' => [':usermail']
     ],
     'new_password_user'=> [
@@ -54,7 +54,7 @@ return [
         'args' => [':userid', ':hash']
     ],
     'find_hash_reset' => [
-        'querry' => 'SELECT userid FROM reset WHERE hash=:hash',
+        'querry' => 'SELECT userid FROM reset WHERE hash=:hash LIMIT 1',
         'args' => [':hash']
     ],
     'delete_reset' => [
@@ -67,20 +67,24 @@ return [
         'args' => [':userid', ':cityid']
     ],
     'coord_list_find_franchisor' => [
-        'querry' => 'SELECT user.userid, user.userfname, user.usersname, franchisor.cityid FROM user, franchisor WHERE franchisor.stage IN (\'application\', \'contract\') AND user.userid=franchisor.userid',
+        'querry' => 'SELECT user.userid, user.userfname, user.usersname, franchisor.cityid FROM user, franchisor WHERE franchisor.havepm=0 AND user.userid=franchisor.userid',
         'args' => []
     ],
     'info_coordinator_franchisor' => [
-        'querry' => 'SELECT user.userfname, user.usersname, user.usertname, user.userpnum, user.usermail, franchisor.* FROM user, franchisor WHERE franchisor.stage IN (\'application\', \'contract\') AND user.userid=franchisor.userid',
+        'querry' => 'SELECT user.userfname, user.usersname, user.usertname, user.userpnum, user.usermail, franchisor.* FROM user, franchisor WHERE franchisor.havepm=0 AND user.userid=:userid AND franchisor.userid=:userid LIMIT 1',
+        'args' => [':userid']
+    ],
+    'info_pm_franchisor' => [
+        'querry' => 'SELECT user.userid, user.userfname, user.usersname, user.usertname, user.userpnum, user.usermail, franchisor.cityid, franchisor.lastupdate FROM user, franchisor WHERE franchisor.havepm=1 AND user.userid=:userid AND franchisor.userid=:userid LIMIT 1',
         'args' => [':userid']
     ],
     'stage_info_franchisor' => [
-        'querry' => 'SELECT stage, applied, lastupdate FROM franchisor WHERE userid=:userid',
+        'querry' => 'SELECT stage, lastupdate FROM franchisor WHERE userid=:userid LIMIT 1',
         'args' => [':userid']
     ],
     
     'coord_list_find_pm' => [
-        'querry' => 'SELECT user.*, pm.* FROM user, pm WHERE user.userid=pm.userid',
+        'querry' => 'SELECT user.userid, user.userfname, user.usersname, user.userpnum, user.usermail, pm.workwith FROM user, pm WHERE user.userid=pm.userid',
         'args' => []
     ],
 ];

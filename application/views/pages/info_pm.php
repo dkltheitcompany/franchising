@@ -15,14 +15,7 @@
         <td>Последнее обновление</td><td><?php echo $project['lastupdate']; ?></td>
     </tr>
 </table>
-<?php if ($project['stage'] != 'application' && $project['stage'] != 'contract' && !$project['havepm']): ?>
-<form action="" method="post">
-    <?php view_project::make_list_pm(model_project::list_pm()); ?>
-</form>
-<?php else: ?>
-Задания:
 <form action="" method="post">
     <?php TaskPool::get_form_gala(); ?>
     <input type="submit" name="submit" value="Подтвердить">
 </form>
-<?php endif; ?>

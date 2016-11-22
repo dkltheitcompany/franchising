@@ -20,7 +20,7 @@ class controller_project
                 view_project::make_list_franch(model_project::list_franch());
                 break;
             case 'project_manager':
-                view_project::make();
+                view_project::make_list_franch_pm(model_project::list_franch_pm());
                 break;
             }
         }
@@ -39,11 +39,17 @@ class controller_project
                 http_response_code(404);
                 break;
             case 'coordinator':
-                model_project::take_form_coord($userid);
-                view_project::make_info_coordinator(model_project::info_coordinator($userid));
+                if (model_project::is_choosen($userid))
+                    header("Location: /project");
+                else
+                {
+                    model_project::take_form_coord($userid);
+                    view_project::make_info_coordinator(model_project::info_coordinator($userid));
+                }
                 break;
             case 'project_manager':
-                view_project::make();
+                model_project::take_form_pm($userid);
+                view_project::make_info_pm(model_project::info_pm($userid));
                 break;
             }
         }

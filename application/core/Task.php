@@ -6,6 +6,7 @@ class Task
     public $taskname;
     public $userid;
     public $taskdone;
+    public $taskrejected;
     public $taskchecked;
     public $taskdate;
     
@@ -17,6 +18,7 @@ class Task
         $this->taskname = $task['taskname'];
         $this->userid = $task['userid'];
         $this->taskdone = $task['taskdone'];
+        $this->taskrejected = $task['taskrejected'];
         $this->taskchecked = $task['taskchecked'];
         $this->taskdate = $task['taskdate'];
         
@@ -53,12 +55,14 @@ class TaskPool
     public function done($taskname)
     {
         self::$tasks[$taskname]->updated = true;
+        self::$tasks[$taskname]->taskrejected = 0;
         self::$tasks[$taskname]->taskdone = true;
     }
     
     public function checked_good($taskname)
     {
         self::$tasks[$taskname]->updated = true;
+        self::$tasks[$taskname]->taskrejected = 0;
         self::$tasks[$taskname]->taskchecked = true;
         foreach (self::$tasks as $task)
         {
@@ -71,12 +75,12 @@ class TaskPool
     public function checked_bad($taskname)
     {
         self::$tasks[$taskname]->updated = true;
+        self::$tasks[$taskname]->taskrejected = 1;
         self::$tasks[$taskname]->taskdone = 0;
     }
     
     public static function save()
     {
-        print_r(self::$tasks);
         if (self::$next_stage)
         {
             $userid = array_shift(self::$tasks)->userid;
@@ -98,7 +102,7 @@ class TaskPool
             {
                 if ($task->updated)
                     DataBase::querry("UPDATE `task` "
-                            . "SET `taskdone`=$task->taskdone, `taskchecked`=$task->taskchecked, `taskdate`=NOW() "
+                            . "SET `taskdone`=$task->taskdone, `taskrejected`=$task->taskrejected, `taskchecked`=$task->taskchecked, `taskdate`=NOW() "
                             . "WHERE `taskid`=$task->taskid");
             }
         }
@@ -110,7 +114,11 @@ class TaskPool
         {
             echo $task->taskname.' ';
             if (!$task->taskdone)
+            {
                 echo "<input type='checkbox' name='{$task->taskname}' value='done'></input> ";
+                if ($task->taskrejected)
+                    echo "rejected ";
+            }
             else if ($task->taskchecked)
                 echo "checked ";
             echo '<br>'.$task->get_form().'<br><br>';
