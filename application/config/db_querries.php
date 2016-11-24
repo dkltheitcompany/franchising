@@ -67,7 +67,7 @@ return [
         'args' => [':userid', ':cityid']
     ],
     'coord_list_find_franchisor' => [
-        'querry' => 'SELECT user.userid, user.userfname, user.usersname, franchisor.cityid FROM user, franchisor WHERE franchisor.havepm=0 AND user.userid=franchisor.userid',
+        'querry' => 'SELECT  user.userfname, user.usersname, user.userpnum, franchisor.cityid, user.userid FROM user, franchisor WHERE franchisor.havepm=0 AND user.userid=franchisor.userid',
         'args' => []
     ],
     'info_coordinator_franchisor' => [
