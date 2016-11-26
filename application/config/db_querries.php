@@ -87,4 +87,9 @@ return [
         'querry' => 'SELECT user.userid, user.userfname, user.usersname, user.userpnum, user.usermail, pm.workwith FROM user, pm WHERE user.userid=pm.userid',
         'args' => []
     ],
+    
+    'find_messages' => [
+        'querry' => 'SELECT mesid, userid, taskid, mesdate, mestext FROM chat WHERE userid=:userid',
+        'args' => [':userid']
+    ]
 ];
