@@ -5,20 +5,24 @@ class Task
     public $taskid;
     public $taskname;
     public $userid;
+    public $forpm;
     public $taskdone;
     public $taskrejected;
+    public $taskmsg;
     public $taskchecked;
     public $taskdate;
     
     public $updated;
     
-    public function __construct($task = null)
+    public function __construct($task)
     {
         $this->taskid = $task['taskid'];
         $this->taskname = $task['taskname'];
         $this->userid = $task['userid'];
+        $this->forpm = $task['forpm'];
         $this->taskdone = $task['taskdone'];
         $this->taskrejected = $task['taskrejected'];
+        $this->taskmsg = $task['taskmsg'];
         $this->taskchecked = $task['taskchecked'];
         $this->taskdate = $task['taskdate'];
         
@@ -28,7 +32,12 @@ class Task
     public function get_form()
     {
         $task_data = include ROOT.'/application/config/task_data.php';
-        return $task_data[$this->taskname];
+        return $task_data[$this->taskname].'<br>'.$this->taskmsg;
+    }
+    
+    public function get_msg()
+    {
+        return "$this->taskmsg<input type='text' name='{$this->taskname}_msg' value=''></input>";
     }
 }
 
@@ -42,14 +51,20 @@ class TaskPool
     {
         $task_tree = include ROOT.'/application/config/task_tree.php';
         foreach ($task_tree['application'] as $task)
-            DataBase::querry("INSERT INTO task (taskname, userid) VALUES ('{$task['taskname']}', $userid)");
+        {
+            DataBase::querry("INSERT INTO task (taskname, userid) VALUES ('{$task['taskname']}', $userid);");
+            $lastid = DataBase::last_insert_id();
+            DataBase::querry("INSERT INTO taskmsg (taskid, taskmsg) VALUES ($lastid, '');");
+        }
     }
     
     public static function load($userid)
     {
-        DataBase::querry("SELECT * FROM task WHERE userid=$userid");
+        DataBase::querry("SELECT task.*, taskmsg.taskmsg FROM task, taskmsg WHERE task.userid=$userid AND task.taskid=taskmsg.taskid");
         while (!empty($task = DataBase::fetch()))
-                self::$tasks[$task['taskname']] = new Task($task);
+        {
+            self::$tasks[$task['taskname']] = new Task($task);
+        }
     }
     
     public function done($taskname)
@@ -72,11 +87,12 @@ class TaskPool
         self::$next_stage = true;
     }
     
-    public function checked_bad($taskname)
+    public function checked_bad($taskname, $msg)
     {
         self::$tasks[$taskname]->updated = true;
         self::$tasks[$taskname]->taskrejected = 1;
         self::$tasks[$taskname]->taskdone = 0;
+        self::$tasks[$taskname]->taskmsg .= '<pre>'.$msg.'</pre>'."\n";
     }
     
     public static function save()
@@ -92,7 +108,9 @@ class TaskPool
             $next_stage = DataBase::fetch()['stage'];
             foreach ($task_tree[$next_stage] as $new_task)
             {
-                DataBase::querry("INSERT INTO task (taskname, userid) VALUES ('{$new_task['taskname']}', $userid)");
+                DataBase::querry("INSERT INTO task (taskname, userid, forpm) VALUES ('{$new_task['taskname']}', $userid, {$new_task['forpm']})");
+                $lastid = DataBase::last_insert_id();
+                DataBase::querry("INSERT INTO taskmsg (taskid, taskmsg) VALUES ($lastid, '');");
             }
             self::load($userid);
         }
@@ -101,9 +119,15 @@ class TaskPool
             foreach (self::$tasks as $task)
             {
                 if ($task->updated)
+                {
                     DataBase::querry("UPDATE `task` "
                             . "SET `taskdone`=$task->taskdone, `taskrejected`=$task->taskrejected, `taskchecked`=$task->taskchecked, `taskdate`=NOW() "
                             . "WHERE `taskid`=$task->taskid");
+                    if (!empty($task->taskmsg))
+                        DataBase::querry("UPDATE taskmsg "
+                                . "SET taskmsg='$task->taskmsg' "
+                                . "WHERE taskid=$task->taskid");
+                }
             }
         }
     }
@@ -112,6 +136,8 @@ class TaskPool
     {
         foreach (self::$tasks as $task)
         {
+            if ($task->forpm)
+                continue;
             echo $task->taskname.' ';
             if (!$task->taskdone)
             {
@@ -123,19 +149,50 @@ class TaskPool
                 echo "checked ";
             echo '<br>'.$task->get_form().'<br><br>';
         }
-        
+        echo 'Задания Руководителя Проэктом:<br>';
+        foreach (self::$tasks as $task)
+        {
+            if (!$task->forpm)
+               continue;
+            echo $task->taskname.' ';
+            if ($task->taskdone && !$task->taskchecked)
+            {echo "<input type='radio' name='{$task->taskname}' value='good'>Ок</input> "
+                . "<input type='radio' name='{$task->taskname}' value='bad'>Упс</input> ";
+            echo '<br>'.$task->get_msg();}
+            echo '<br><br>';
+        }
+        echo '<input type="submit" name="submit" value="Подтвердить">';
     }
     
     public static function get_form_gala()
     {
         foreach (self::$tasks as $task)
         {
+            if (!$task->forpm)
+                continue;
+            echo $task->taskname.' ';
+            if (!$task->taskdone)
+            {
+                echo "<input type='checkbox' name='{$task->taskname}' value='done'></input> ";
+                if ($task->taskrejected)
+                    echo "rejected ";
+            }
+            else if ($task->taskchecked)
+                echo "checked ";
+            echo '<br>'.$task->get_form().'<br><br>';
+        }
+        echo 'Задания Франчизи:<br>';
+        foreach (self::$tasks as $task)
+        {
+            if ($task->forpm)
+                continue;
             echo $task->taskname.' ';
             if ($task->taskdone && !$task->taskchecked)
-                echo "<input type='radio' name='{$task->taskname}' value='good'>Ок</input> "
+            {echo "<input type='radio' name='{$task->taskname}' value='good'>Ок</input> "
                 . "<input type='radio' name='{$task->taskname}' value='bad'>Упс</input> ";
-            echo "<br><br>";
-            //echo $task->get_form().'\n';
+            echo '<br>'.$task->get_msg();}
+            echo '<br><br>';
         }
+        echo '<input type="submit" name="submit" value="Подтвердить">';
     }
 }

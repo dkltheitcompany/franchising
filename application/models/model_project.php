@@ -22,6 +22,10 @@ class model_project
         {
             if ($_POST[$task->taskname] == 'done')
                 TaskPool::done($task->taskname);
+            else if ($_POST[$task->taskname] == 'good')
+                TaskPool::checked_good($task->taskname);
+            else if ($_POST[$task->taskname] == 'bad')
+                TaskPool::checked_bad($task->taskname, $_POST["{$task->taskname}_msg"]);
         }
         TaskPool::save();
     }
@@ -41,7 +45,7 @@ class model_project
             if ($_POST[$task->taskname] == 'good')
                 TaskPool::checked_good($task->taskname);
             else if ($_POST[$task->taskname] == 'bad')
-                TaskPool::checked_bad($task->taskname);
+                TaskPool::checked_bad($task->taskname, $_POST["{$task->taskname}_msg"]);
         }
         TaskPool::save();
     }
@@ -71,10 +75,14 @@ class model_project
         TaskPool::load($userid);
         foreach (TaskPool::$tasks as $task)
         {
-            if ($_POST[$task->taskname] == 'good')
+            if ($_POST[$task->taskname] == 'done')
+            {
+                TaskPool::done($task->taskname);
+            }
+            else if ($_POST[$task->taskname] == 'good')
                 TaskPool::checked_good($task->taskname);
             else if ($_POST[$task->taskname] == 'bad')
-                TaskPool::checked_bad($task->taskname);
+                TaskPool::checked_bad($task->taskname, $_POST["{$task->taskname}_msg"]);
         }
         TaskPool::save();
     }

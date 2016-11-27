@@ -23,6 +23,5 @@
 Задания:
 <form action="" method="post">
     <?php TaskPool::get_form_gala(); ?>
-    <input type="submit" name="submit" value="Подтвердить">
 </form>
 <?php endif; ?>
