@@ -39,7 +39,7 @@ class controller_project
                 http_response_code(404);
                 break;
             case 'coordinator':
-                if (model_project::is_choosen($userid))
+                if (model_project::is_choosen($userid) || model_project::not_for_coord($userid))
                     header("Location: /project");
                 else
                 {
@@ -48,8 +48,13 @@ class controller_project
                 }
                 break;
             case 'project_manager':
-                model_project::take_form_pm($userid);
-                view_project::make_info_pm(model_project::info_pm($userid));
+                if (model_project::not_for_pm($userid))
+                    header("Location: /project");
+                else
+                {
+                    model_project::take_form_pm($userid);
+                    view_project::make_info_pm(model_project::info_pm($userid));
+                }
                 break;
             }
         }

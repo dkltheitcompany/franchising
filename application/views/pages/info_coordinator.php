@@ -20,7 +20,6 @@
     <?php view_project::make_list_pm(model_project::list_pm()); ?>
 </form>
 <?php else: ?>
-Задания:
 <form action="" method="post">
     <?php TaskPool::get_form_gala(); ?>
 </form>

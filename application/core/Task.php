@@ -52,7 +52,8 @@ class TaskPool
         $task_tree = include ROOT.'/application/config/task_tree.php';
         foreach ($task_tree['application'] as $task)
         {
-            DataBase::querry("INSERT INTO task (taskname, userid) VALUES ('{$task['taskname']}', $userid);");
+            $taskdeadline = time() + $task['taskdeadline'] * 24 * 60 * 60;
+            DataBase::querry("INSERT INTO task (taskname, userid, forpm, taskdeadline) VALUES ('{$task['taskname']}', $userid, {$task['forpm']}, FROM_UNIXTIME($taskdeadline));");
             $lastid = DataBase::last_insert_id();
             DataBase::querry("INSERT INTO taskmsg (taskid, taskmsg) VALUES ($lastid, '');");
         }
@@ -74,11 +75,13 @@ class TaskPool
         self::$tasks[$taskname]->taskdone = true;
     }
     
-    public function checked_good($taskname)
+    public function checked_good($taskname, $msg)
     {
         self::$tasks[$taskname]->updated = true;
         self::$tasks[$taskname]->taskrejected = 0;
         self::$tasks[$taskname]->taskchecked = true;
+        if (!empty($msg))
+            self::$tasks[$taskname]->taskmsg .= '<pre>CONFIRMED: '.$msg.'</pre>'."\n";
         foreach (self::$tasks as $task)
         {
              if (!$task->taskchecked)
@@ -92,7 +95,8 @@ class TaskPool
         self::$tasks[$taskname]->updated = true;
         self::$tasks[$taskname]->taskrejected = 1;
         self::$tasks[$taskname]->taskdone = 0;
-        self::$tasks[$taskname]->taskmsg .= '<pre>'.$msg.'</pre>'."\n";
+        if (!empty($msg))
+            self::$tasks[$taskname]->taskmsg .= '<pre>REJECTED: '.$msg.'</pre>'."\n";
     }
     
     public static function save()
@@ -108,7 +112,8 @@ class TaskPool
             $next_stage = DataBase::fetch()['stage'];
             foreach ($task_tree[$next_stage] as $new_task)
             {
-                DataBase::querry("INSERT INTO task (taskname, userid, forpm) VALUES ('{$new_task['taskname']}', $userid, {$new_task['forpm']})");
+                $taskdeadline = time() + $task_new['taskdeadline'] * 24 * 60 * 60;
+                DataBase::querry("INSERT INTO task (taskname, userid, forpm, taskdeadline) VALUES ('{$new_task['taskname']}', $userid, {$new_task['forpm']}, FROM_UNIXTIME($taskdeadline));");
                 $lastid = DataBase::last_insert_id();
                 DataBase::querry("INSERT INTO taskmsg (taskid, taskmsg) VALUES ($lastid, '');");
             }
@@ -142,11 +147,7 @@ class TaskPool
             if (!$task->taskdone)
             {
                 echo "<input type='checkbox' name='{$task->taskname}' value='done'></input> ";
-                if ($task->taskrejected)
-                    echo "rejected ";
             }
-            else if ($task->taskchecked)
-                echo "checked ";
             echo '<br>'.$task->get_form().'<br><br>';
         }
         echo 'Задания Руководителя Проэктом:<br>';
@@ -174,11 +175,7 @@ class TaskPool
             if (!$task->taskdone)
             {
                 echo "<input type='checkbox' name='{$task->taskname}' value='done'></input> ";
-                if ($task->taskrejected)
-                    echo "rejected ";
             }
-            else if ($task->taskchecked)
-                echo "checked ";
             echo '<br>'.$task->get_form().'<br><br>';
         }
         echo 'Задания Франчизи:<br>';

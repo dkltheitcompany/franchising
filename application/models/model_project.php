@@ -23,7 +23,7 @@ class model_project
             if ($_POST[$task->taskname] == 'done')
                 TaskPool::done($task->taskname);
             else if ($_POST[$task->taskname] == 'good')
-                TaskPool::checked_good($task->taskname);
+                TaskPool::checked_good($task->taskname, $_POST["{$task->taskname}_msg"]);
             else if ($_POST[$task->taskname] == 'bad')
                 TaskPool::checked_bad($task->taskname, $_POST["{$task->taskname}_msg"]);
         }
@@ -43,7 +43,7 @@ class model_project
         foreach (TaskPool::$tasks as $task)
         {
             if ($_POST[$task->taskname] == 'good')
-                TaskPool::checked_good($task->taskname);
+                TaskPool::checked_good($task->taskname, $_POST["{$task->taskname}_msg"]);
             else if ($_POST[$task->taskname] == 'bad')
                 TaskPool::checked_bad($task->taskname, $_POST["{$task->taskname}_msg"]);
         }
@@ -61,16 +61,28 @@ class model_project
     {
         if (isset($_POST['choose']))
         {
-            DataBase::querry("SELECT workwith FROM pm WHERE userid={$_POST['userid']}");
-            $workwith = DataBase::fetch()['workwith'].' '.$userid;
-            DataBase::querry("UPDATE pm SET workwith=$workwith WHERE userid={$_POST['userid']}");
-            DataBase::querry("UPDATE franchisor SET havepm=1 WHERE userid=$userid");
+            DataBase::querry("UPDATE franchisor SET pmid={$_POST['userid']} WHERE userid=$userid");
             return true;
         }
         return false;
     }
     
-    public static function take_form_pm($userid)
+    public static function not_for_coord($userid)
+    {
+        DataBase::querry("SELECT userid FROM franchisor WHERE userid=$userid");
+        if (empty(DataBase::fetch()))
+            return true;
+        DataBase::querry("SELECT pmid FROM franchisor WHERE userid=$userid");
+        return !empty(DataBase::fetch()['pmid']);
+    }
+    
+    public static function not_for_pm($userid)
+    {
+        DataBase::querry("SELECT pmid FROM franchisor WHERE userid=$userid");
+        return DataBase::fetch()['pmid'] != $_SESSION['userid'];
+    }
+
+        public static function take_form_pm($userid)
     {
         TaskPool::load($userid);
         foreach (TaskPool::$tasks as $task)
@@ -80,7 +92,7 @@ class model_project
                 TaskPool::done($task->taskname);
             }
             else if ($_POST[$task->taskname] == 'good')
-                TaskPool::checked_good($task->taskname);
+                TaskPool::checked_good($task->taskname, $_POST["{$task->taskname}_msg"]);
             else if ($_POST[$task->taskname] == 'bad')
                 TaskPool::checked_bad($task->taskname, $_POST["{$task->taskname}_msg"]);
         }
@@ -96,14 +108,8 @@ class model_project
     
     public static function list_franch_pm()
     {
-        DataBase::querry("SELECT workwith FROM pm WHERE userid={$_SESSION['userid']}");
-        $workwith = preg_split('~ ~', DataBase::fetch()['workwith']);
-        $franch = [];
-        foreach ($workwith as $userid)
-        {
-            DataBase::querry_tmp('info_pm_franchisor', $userid);
-            $franch[] = DataBase::fetch();
-        }
+        DataBase::querry_tmp('list_pm_franchisor', $_SESSION['userid']);
+        $franch = DataBase::fetch_all();
         return $franch;
     }
 }

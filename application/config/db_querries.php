@@ -67,11 +67,15 @@ return [
         'args' => [':userid', ':cityid']
     ],
     'coord_list_find_franchisor' => [
-        'querry' => 'SELECT user.userid, user.userfname, user.usersname, franchisor.cityid FROM user, franchisor WHERE franchisor.havepm=0 AND user.userid=franchisor.userid',
+        'querry' => 'SELECT user.userid, user.userfname, user.usersname, franchisor.cityid FROM user, franchisor WHERE franchisor.pmid IS NULL AND user.userid=franchisor.userid',
         'args' => []
     ],
+    'list_pm_franchisor' => [
+        'querry' => 'SELECT user.userid, user.userfname, user.usersname, user.usertname, user.userpnum, user.usermail, franchisor.cityid, franchisor.lastupdate FROM user, franchisor WHERE franchisor.pmid=:userid AND user.userid=franchisor.userid',
+        'args' => [':userid']
+    ],
     'info_coordinator_franchisor' => [
-        'querry' => 'SELECT user.userfname, user.usersname, user.usertname, user.userpnum, user.usermail, franchisor.* FROM user, franchisor WHERE franchisor.havepm=0 AND user.userid=:userid AND franchisor.userid=:userid LIMIT 1',
+        'querry' => 'SELECT user.userfname, user.usersname, user.usertname, user.userpnum, user.usermail, franchisor.* FROM user, franchisor WHERE franchisor.pmid IS NULL AND user.userid=:userid AND franchisor.userid=:userid LIMIT 1',
         'args' => [':userid']
     ],
     'info_pm_franchisor' => [
@@ -84,7 +88,7 @@ return [
     ],
     
     'coord_list_find_pm' => [
-        'querry' => 'SELECT user.userid, user.userfname, user.usersname, user.userpnum, user.usermail, pm.workwith FROM user, pm WHERE user.userid=pm.userid',
+        'querry' => 'SELECT user.userid, user.userfname, user.usersname, user.userpnum, user.usermail FROM user, pm WHERE user.userid=pm.userid',
         'args' => []
     ],
 ];
