@@ -91,4 +91,19 @@ return [
         'querry' => 'SELECT user.userid, user.userfname, user.usersname, user.userpnum, user.usermail FROM user, pm WHERE user.userid=pm.userid',
         'args' => []
     ],
+    
+    'find_messages' => [
+        'querry' => 'SELECT mesid, desuserid, senduserid, mesdate, mestext FROM chat WHERE desuserid=:userid OR senduserid=:userid ORDER BY mesdate DESC',
+        'args' => [':userid']
+    ],
+    
+    'send_message' => [
+        'querry' => 'INSERT INTO chat(desuserid, senduserid, mestext) VALUES (:desuserid, :senduserid, :mestext)',
+        'args' => [':desuserid', ':senduserid', ':mestext']
+    ],
+    
+    'is_correct_comp' => [
+        'querry' => 'SELECT * FROM pm WHERE (userid=:userid AND workwith=:compid) OR (workwith=:userid AND userid=:compid)',
+        'args' => [':userid', ':compid']
+    ]
 ];
