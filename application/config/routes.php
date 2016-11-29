@@ -12,5 +12,6 @@ return [
     '^/project/([0-9]+)/?$' => ['controller' => 'project', 'action'=> 'project_info', 'args' => '$1'],
     '^/reset/?$' => ['controller' => 'authorization', 'action' => 'apply_reset_password'],
     '^/reset/(.{40})$' => ['controller' => 'authorization', 'action' => 'reset', 'args' => '$1'],
-    '^/chat/?$' => ['controller' => 'chat', 'action' => 'index']
+    '^/chat/?$' => ['controller' => 'chat', 'action' => 'index'],
+    '^/chat/([0-9]+)/?$' => ['controller' => 'chat', 'action' => 'show_one', 'args' => '$1']
 ];
