@@ -2,6 +2,5 @@
 
 foreach (model_chat::$companions as $value)
 {
-    $href = "'/chat/$value'";
-    echo "<a href=$href>$value</a><br>";
+    echo "<a href='/chat/{$value['userid']}'>{$value['userfname']} {$value['usersname']} {$value['usertname']}</a><br>";
 }

@@ -92,18 +92,21 @@ return [
         'args' => []
     ],
     
-    'find_messages' => [
-        'querry' => 'SELECT mesid, desuserid, senduserid, mesdate, mestext FROM chat WHERE desuserid=:userid OR senduserid=:userid ORDER BY mesdate DESC',
+    'find_messages_chat' => [
+        'querry' => 'SELECT chat.mesid, chat.mesdate, chat.mestext, 
+            u1.userfname AS desuserfname, u1.usersname AS desusersname, u1.usertname AS desusertname, 
+            u2.userfname AS senduserfname, u2.usersname AS sendusersname, u2.usertname AS sendusertname 
+            FROM chat, user AS u1, user AS u2 WHERE (chat.desuserid=:userid OR chat.senduserid=:userid) AND 
+            u1.userid=chat.desuserid AND u2.userid=chat.senduserid 
+            ORDER BY mesdate DESC',
         'args' => [':userid']
     ],
-    
-    'send_message' => [
+    'send_message_chat' => [
         'querry' => 'INSERT INTO chat(desuserid, senduserid, mestext) VALUES (:desuserid, :senduserid, :mestext)',
         'args' => [':desuserid', ':senduserid', ':mestext']
     ],
-    
     'is_correct_comp' => [
-        'querry' => 'SELECT * FROM pm WHERE (userid=:userid AND workwith=:compid) OR (workwith=:userid AND userid=:compid)',
+        'querry' => 'SELECT userid FROM franchisor WHERE (userid=:userid AND pmid=:compid) OR (pmid=:userid AND userid=:compid) LIMIT 1',
         'args' => [':userid', ':compid']
     ]
 ];

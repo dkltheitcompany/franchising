@@ -5,38 +5,35 @@ include ROOT.'/application/views/view_chat.php';
 
 class controller_chat 
 {
-    public static $accord = [
-        'franchisor' => ['workwith','userid'],
-        'project_manager' => ['userid', 'workwith']
-    ];
-    
-    
     public static function index()
     {
         session_start();
-        if (isset($_SESSION['userid']))
+        if (isset($_SESSION['userid']) && $_SESSION['usertype'] != 'coordinator')
         {
-            model_chat::find_chats(self::$accord[$_SESSION['usertype']]);
+            model_chat::find_chats();
             view_chat::make_general();
         }
         else 
-            header("HTTP/1.0 404 Not Found");
+            http_response_code(404);
     }
     
-    public static function show_one($compid)
+    public static function show_one($userid)
     {
         session_start();
         if (isset($_SESSION['userid']))
         {
-            DataBase::querry_tmp('is_correct_comp', $_SESSION['userid'], $compid);
+            DataBase::querry_tmp('is_correct_comp', $_SESSION['userid'], $userid);
             
             if (!empty(DataBase::fetch_all()))
             {
-                model_chat::find_messages($compid);
+                model_chat::find_messages($userid);
                 view_chat::make_one();
             }
+            else
+                http_response_code(404);
+                
         }
-        else 
-            header("HTTP/1.0 404 Not Found");
+        else
+            http_response_code(404);
     }
 }
