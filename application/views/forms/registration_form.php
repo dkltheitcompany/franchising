@@ -25,6 +25,15 @@
         <td align='right'>Повторите пароль:</td>      <?php echo "<td align='right'><input name='repeatpassword' type='password' pattern='{$regex['userpassword']}' required value=''></input></td>"; ?>
     </tr>
     <tr>
+        <td align='right'>Ваш тип:</td>               
+            
+            <?php echo "<td align='right'><select name='usertype'>
+        <option value='franchiser'>Фанчайзи</option>
+        <option value='coordinator'>Координатор</option>
+        <option value='project_manager'>Рководитель проекта</option>
+    </select></td>"  ?>
+    </tr>
+    <tr>
         <td colspan='2' align='right'><input name='submit_reg' type='submit'></input></td>
     </tr>
     </table>

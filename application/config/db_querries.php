@@ -10,12 +10,12 @@ return [
         'args' => [':usermail', ':userpnum']
     ],
     'add_user_tmp' => [
-        'querry' => 'INSERT INTO user_tmp (usercode, userfname, usersname, usertname, usermail, userpnum, userpassword) '
-        . 'VALUES (:usercode, :userfname, :usersname, :usertname, :usermail, :userpnum, :userpassword)',
-        'args' => [':usercode', ':userfname', ':usersname', ':usertname', ':usermail', ':userpnum', ':userpassword']
+        'querry' => 'INSERT INTO user_tmp (usercode, userfname, usersname, usertname, usermail, userpnum, usertype, userpassword) '
+        . 'VALUES (:usercode, :userfname, :usersname, :usertname, :usermail, :userpnum,:usertype, :userpassword)',
+        'args' => [':usercode', ':userfname', ':usersname', ':usertname', ':usermail', ':userpnum',':usertype',':userpassword']
     ],
     'check_code_user_tmp' => [
-        'querry' => 'SELECT usercode, userfname, usersname, usertname, usermail, userpnum, userpassword FROM user_tmp WHERE usercode=:usercode AND usermail=:usermail LIMIT 1',
+        'querry' => 'SELECT usercode, userfname, usersname, usertname, usermail, userpnum, usertype, userpassword FROM user_tmp WHERE usercode=:usercode AND usermail=:usermail LIMIT 1',
         'args' => [':usercode', ':usermail']
     ],
     'repeat_apply_user_tmp' => [

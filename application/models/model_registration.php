@@ -81,7 +81,7 @@ class model_registration
             $usercode = self::generate_key();
             DataBase::querry_tmp('add_user_tmp',
                     $usercode, $_POST['userfname'], $_POST['usersname'], $_POST['usertname'],
-                    $_POST['usermail'], $_POST['userpnum'], $encpword);
+                    $_POST['usermail'], $_POST['userpnum'],$_POST['usertype'], $encpword);
         } while (DataBase::error() == 23000);
         MailMessager::sendmsg('reg_apply', $_POST['usermail'], $usercode);
     }
@@ -98,7 +98,7 @@ class model_registration
         DataBase::querry_tmp('add_user',
                 self::$user['userfname'], self::$user['usersname'], self::$user['usertname'], 
                 self::$user['usermail'], self::$user['userpnum'], self::$user['userpassword'],
-                'franchisor');
+                self::$user['usertype']);
         $userid = DataBase::last_insert_id();
         DataBase::querry_tmp('add_new_franchisor', $userid, 42);
         TaskPool::new_task_pool($userid);
