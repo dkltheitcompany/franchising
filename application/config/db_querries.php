@@ -79,7 +79,7 @@ return [
         'args' => [':userid']
     ],
     'info_pm_franchisor' => [
-        'querry' => 'SELECT user.userid, user.userfname, user.usersname, user.usertname, user.userpnum, user.usermail, franchisor.cityid, franchisor.lastupdate FROM user, franchisor WHERE franchisor.havepm=1 AND user.userid=:userid AND franchisor.userid=:userid LIMIT 1',
+        'querry' => 'SELECT user.userid, user.userfname, user.usersname, user.usertname, user.userpnum, user.usermail, franchisor.cityid, franchisor.lastupdate FROM user, franchisor WHERE user.userid=:userid AND franchisor.userid=:userid LIMIT 1',
         'args' => [':userid']
     ],
     'stage_info_franchisor' => [

@@ -7,6 +7,6 @@
     </tr>
 </table>
 Мои задания:
-<form action="" method="post">
+<form action="" enctype="multipart/form-data" method="post">
     <?php TaskPool::get_form_franch(); ?>
 </form>

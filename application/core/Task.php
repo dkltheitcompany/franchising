@@ -6,6 +6,8 @@ class Task
     public $taskname;
     public $userid;
     public $forpm;
+    public $files;
+    public $fileid;
     public $taskdone;
     public $taskrejected;
     public $taskmsg;
@@ -20,6 +22,8 @@ class Task
         $this->taskname = $task['taskname'];
         $this->userid = $task['userid'];
         $this->forpm = $task['forpm'];
+        $this->files = $task['files'];
+        $this->fileid = $task['fileid'];
         $this->taskdone = $task['taskdone'];
         $this->taskrejected = $task['taskrejected'];
         $this->taskmsg = $task['taskmsg'];
@@ -53,7 +57,7 @@ class TaskPool
         foreach ($task_tree['application'] as $task)
         {
             $taskdeadline = time() + $task['taskdeadline'] * 24 * 60 * 60;
-            DataBase::querry("INSERT INTO task (taskname, userid, forpm, taskdeadline) VALUES ('{$task['taskname']}', $userid, {$task['forpm']}, FROM_UNIXTIME($taskdeadline));");
+            DataBase::querry("INSERT INTO task (taskname, userid, forpm, files, taskdeadline) VALUES ('{$task['taskname']}', $userid, {$task['forpm']}, {$task['files']}, FROM_UNIXTIME($taskdeadline));");
             $lastid = DataBase::last_insert_id();
             DataBase::querry("INSERT INTO taskmsg (taskid, taskmsg) VALUES ($lastid, '');");
         }
@@ -70,6 +74,18 @@ class TaskPool
     
     public function done($taskname)
     {
+        if (self::$tasks[$taskname]->files)
+        {
+            if (empty($_FILES[$taskname.'_file']) || $_FILES[$taskname.'_file']['error'] != 0)
+            {
+                return;
+            }
+            else
+            {
+                File::save_file($taskname.'_file');
+                self::$tasks[$taskname]->fileid = DataBase::last_insert_id();
+            }
+        }
         self::$tasks[$taskname]->updated = true;
         self::$tasks[$taskname]->taskrejected = 0;
         self::$tasks[$taskname]->taskdone = true;
@@ -112,8 +128,8 @@ class TaskPool
             $next_stage = DataBase::fetch()['stage'];
             foreach ($task_tree[$next_stage] as $new_task)
             {
-                $taskdeadline = time() + $task_new['taskdeadline'] * 24 * 60 * 60;
-                DataBase::querry("INSERT INTO task (taskname, userid, forpm, taskdeadline) VALUES ('{$new_task['taskname']}', $userid, {$new_task['forpm']}, FROM_UNIXTIME($taskdeadline));");
+                $taskdeadline = time() + $new_task['taskdeadline'] * 24 * 60 * 60;
+                DataBase::querry("INSERT INTO task (taskname, userid, forpm, files, taskdeadline) VALUES ('{$new_task['taskname']}', $userid, {$new_task['forpm']}, {$new_task['files']}, FROM_UNIXTIME($taskdeadline));");
                 $lastid = DataBase::last_insert_id();
                 DataBase::querry("INSERT INTO taskmsg (taskid, taskmsg) VALUES ($lastid, '');");
             }
@@ -128,6 +144,10 @@ class TaskPool
                     DataBase::querry("UPDATE `task` "
                             . "SET `taskdone`=$task->taskdone, `taskrejected`=$task->taskrejected, `taskchecked`=$task->taskchecked, `taskdate`=NOW() "
                             . "WHERE `taskid`=$task->taskid");
+                    if (!empty($task->fileid))
+                        DataBase::querry("UPDATE `task` "
+                                . "SET `fileid`=$task->fileid "
+                                . "WHERE `taskid`=$task->taskid");
                     if (!empty($task->taskmsg))
                         DataBase::querry("UPDATE taskmsg "
                                 . "SET taskmsg='$task->taskmsg' "
@@ -147,6 +167,10 @@ class TaskPool
             if (!$task->taskdone)
             {
                 echo "<input type='checkbox' name='{$task->taskname}' value='done'></input> ";
+                if ($task->files)
+                {
+                    echo "<input type='file' name='{$task->taskname}_file'></input> ";
+                }
             }
             echo '<br>'.$task->get_form().'<br><br>';
         }
@@ -159,6 +183,8 @@ class TaskPool
             if ($task->taskdone && !$task->taskchecked)
             {echo "<input type='radio' name='{$task->taskname}' value='good'>Ок</input> "
                 . "<input type='radio' name='{$task->taskname}' value='bad'>Упс</input> ";
+            if (!empty($task->fileid))
+                echo "<a href='/load/{$task->fileid}' target='_blank'>Attachment</a><br>";
             echo '<br>'.$task->get_msg();}
             echo '<br><br>';
         }
@@ -175,6 +201,10 @@ class TaskPool
             if (!$task->taskdone)
             {
                 echo "<input type='checkbox' name='{$task->taskname}' value='done'></input> ";
+                if ($task->files)
+                {
+                    echo "<input type='file' name='{$task->taskname}_file'></input> ";
+                }
             }
             echo '<br>'.$task->get_form().'<br><br>';
         }
@@ -187,6 +217,8 @@ class TaskPool
             if ($task->taskdone && !$task->taskchecked)
             {echo "<input type='radio' name='{$task->taskname}' value='good'>Ок</input> "
                 . "<input type='radio' name='{$task->taskname}' value='bad'>Упс</input> ";
+            if (!empty($task->fileid))
+                echo "<a href='/load/{$task->fileid}' target='_blank'>Attachment</a><br>";
             echo '<br>'.$task->get_msg();}
             echo '<br><br>';
         }
